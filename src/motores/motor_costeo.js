@@ -35,5 +35,46 @@ class MotorCosteo {
         const resPadre = await this.db.query(queryPadre, [recetaId]);
         const rendimientoPadre = resPadre.rows[0]?.porciones_rinde || 1;
         const nombrePadre = resPadre.rows[0]?.nombre || 'Receta Desconocida';
+
+        for (const item of detalles) {
+
+            if (item.insumo_id) {
+                const costoItem = parseFloat(item.cantidad_necesaria) * parseFloat(item.costo_promedio || 0);
+                costoTotalCalculado += costoItem;
+
+                desglose.push({
+                    tipo: 'INSUMO',
+                    nombre: item.insumo_nombre,
+                    cantidad_usada: Number(item.cantidad_necesaria),
+                    costo_unitario_bd: Number(item.costo_promedio),
+                    subtotal: this.redondear(costoItem)
+                });
+            }
+            else if (item.sub_receta_id) {
+                const resultadoSubReceta = await this.calcularCostoReceta(
+                    item.sub_receta_id,
+                    memo,
+                    new Set(path)
+                );
+
+                const costoPorPorcionSub = resultadoSubReceta.costoPorPorcion;
+                const costoItem = parseFloat(item.cantidad_necesaria) * costoPorPorcionSub;
+
+                costoTotalCalculado += costoItem;
+
+                desglose.push({
+                    tipo: 'SUB_RECETA',
+                    nombre: item.subreceta_nombre,
+                    cantidad_usada: Number(item.cantidad_necesaria),
+                    subtotal: this.redondear(costoItem),
+                    detalle_interno: resultadoSubReceta.desglose
+                });
+            }
+        }
+
+        path.delete(recetaId);
+    }
+    redondear(num) {
+        return Math.round(num * 100) / 100;
     }
 }
