@@ -45,4 +45,4 @@ coverage/
 *.rej
 
 #Pruebas
-motores/prueba_manual.js
+src/motores/prueba_manual.js
