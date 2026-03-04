@@ -131,4 +131,4 @@ class MotorCosteo {
     }
 }
 
-modulo.exports = MotorCosteoDinamico;
+module.exports = MotorCosteoDinamico;
