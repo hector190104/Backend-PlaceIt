@@ -130,3 +130,5 @@ class MotorCosteo {
         return Math.round(num * 100) / 100;
     }
 }
+
+modulo.exports = MotorCosteoDinamico;
