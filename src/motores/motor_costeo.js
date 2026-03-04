@@ -73,6 +73,20 @@ class MotorCosteo {
         }
 
         path.delete(recetaId);
+
+        const costoUnitarioFinal = costoTotalCalculado / rendimientoPadre;
+
+        const respuesta = {
+            receta_id: recetaId,
+            nombre_receta: nombrePadre,
+            rinde_porciones: rendimientoPadre,
+            costoTotalReceta: this.redondear(costoTotalCalculado),
+            costoPorPorcion: this.redondear(costoUnitarioFinal),
+            desglose: desglose
+        };
+
+        memoiza[recetaId] = respuesta;
+        return respuesta;
     }
     redondear(num) {
         return Math.round(num * 100) / 100;
