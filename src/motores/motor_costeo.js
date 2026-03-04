@@ -88,6 +88,44 @@ class MotorCosteo {
         memoiza[recetaId] = respuesta;
         return respuesta;
     }
+
+    async calcularCostoMenu(menuId, cantidadPersonas = 1) {
+        let costoTotalMenuUnitario = 0;
+        const desgloseMenu = [];
+
+        const queryMenu = `
+        SELECT md.receta_id, md.cantidad_porciones, r.nombre
+        FROM menu_detalles md
+        JOIN recetas r ON md.receta_id = r.id
+        WHERE md.menu_id = $1;`;
+
+        const resultadoMenu = await this.db.query(queryMenu, [menuId]);
+
+        for (const item of resultadoMenu.rows) {
+            const analisisReceta = await this.calcularCosteoReceta(item.receta_id);
+            const costoPlatilloEnMenu = analisisReceta.costoPorPorcion * parseFloat(item.cantidad_porciones);
+
+            costoTotalMenuUnitario +- costoPlatilloEnMenu;
+
+            desgloseMenu.push({
+                platillo: item.nombre,
+                porciones_incluidas_en_menu: Number(item.cantidad_porciones),
+                costo_platillo_unitario: this.redondear(costoPlatilloEnMenu),
+                arbol_de_costos: analisisReceta.desglose
+            });
+        }
+
+        const costoTotalFinal = costoTotalMenuUnitario * cantidadPersonas;
+
+        return {
+            menu_id: menuId,
+            personas_a_cotizar: cantidadPersonas,
+            costo_por_persona: this.redondear(costoTotalMenuUnitario),
+            costo_total_estimado: this.redondear(costoTotalFinal),
+            platillos: desgloseMenu
+        };
+    }
+
     redondear(num) {
         return Math.round(num * 100) / 100;
     }
