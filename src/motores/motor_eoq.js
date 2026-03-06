@@ -32,6 +32,17 @@ class MotorEOQ {
         //datos a verificar
         const costoPorPedido = 150.00; //reemplazar
         const costoMantenimientoAnual = parseFloat(insumo.costo_promedio) * 0.20;
-        const diasEntregaProveedor = 3;  
+        const diasEntregaProveedor = 3;
+
+        return this._ejecutarAlgoritmo(
+            insumo.nombre,
+            demandaAnual,
+            demandaDiaria,
+            costoPorPedido,
+            costoMantenimientoAnual,
+            diasEntregaProveedor,
+            parseFloat(insumo.stock_minimo),
+            parseFloat(insumo.stock_actual)
+        );
     }
 }
